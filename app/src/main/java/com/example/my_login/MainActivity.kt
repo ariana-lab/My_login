@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
                     HomeScreen(navController)
                 }
                 composable(Routes.stadisticscreen, ){
-                    StadisticScreen()
+                    Inicio()
                 }
            })
        }

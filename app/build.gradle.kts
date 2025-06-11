@@ -60,6 +60,8 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class:1.3.2")
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.4.0-alpha14")
     implementation("androidx.compose.material:material:1.8.1")
+    implementation("androidx.compose.material:material-icons-extended:1.6.7")
+
 
     val nav_version = "2.9.0"
     implementation("androidx.navigation:navigation-compose:$nav_version")
