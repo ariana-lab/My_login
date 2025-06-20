@@ -1,6 +1,6 @@
 package com.example.my_login
 
-import android.util.Log
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,32 +33,36 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavController
-import androidx.navigation.Navigator
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController, auth: FirebaseAuth) {
 
-    var email by remember {
-        mutableStateOf("")
-    }
+    var email by remember { mutableStateOf("") }
+    var contraseña by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
 
-    var contraseña by remember {
-        mutableStateOf("")
-    }
-
-    Column (
-        modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(
-            colors = listOf(
-                Color(0xFFDE3163),
-                Color(0xFFFFFFFF))
-            )
-        ),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFDE3163),
+                        Color(0xFFFFFFFF)
+                    )
+                )
+            ),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(painter = painterResource(id = R.drawable.ic_logo), contentDescription = "Login image", modifier = Modifier.size(200.dp))
-        Text(text ="Equilibrio+", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+        Image(
+            painter = painterResource(id = R.drawable.ic_logo),
+            contentDescription = "Login image",
+            modifier = Modifier.size(200.dp)
+        )
+        Text(text = "Equilibrio+", fontSize = 28.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(6.dp))
         Text(text = "Ingresa a tu cuenta!")
@@ -67,59 +71,78 @@ fun LoginScreen(navController: NavController){
 
         OutlinedTextField(
             value = email,
-            onValueChange = {
-            email = it },
-            label = {Text(text = "Email...")},
+            onValueChange = { email = it },
+            label = { Text(text = "Email...") },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFFFFFFF),
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.White
             ),
-            textStyle = TextStyle( color = Color.Black, fontSize = 16.sp
-            ))
+            textStyle = TextStyle(color = Color.Black, fontSize = 16.sp)
+        )
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = contraseña,
-            onValueChange = {
-            contraseña = it
-        },label = {
-            Text(text = "Contraseña...") },
+            onValueChange = { contraseña = it },
+            label = { Text(text = "Contraseña...") },
             shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFFFFFFFF),
+                focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.White
             ),
-            textStyle = TextStyle( color = Color.Black, fontSize = 16.sp),
-            visualTransformation = PasswordVisualTransformation())
+            textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+            visualTransformation = PasswordVisualTransformation()
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
-                Log.i("Credential", "Usuario: $email Contraseña:$contraseña")
-                navController.navigate(Routes.homescreen)
+                auth.signInWithEmailAndPassword(email, contraseña)
+                    .addOnCompleteListener { result ->
+                        if (result.isSuccessful) {
+                            error = null
+                            navController.navigate(Routes.homescreen) {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        } else {
+                            error =
+                                "No tienes una cuenta con esas credenciales.\n¡Regístrate para guardar tus estadísticas!"
+                        }
+                    }
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFFFFFF),
+                containerColor = Color.White,
                 contentColor = Color.Black
             )
-        )
-        {
+        ) {
             Text(text = "Iniciar sesión")
+        }
+
+        // 🔴 Mostrar mensaje si hay error
+        error?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = it,
+                color = Color.Red,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(horizontal = 16.dp),
+                lineHeight = 18.sp
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = {
+                navController.navigate(Routes.registerscreen)
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFDE3163),
                 contentColor = Color.White
             )
-        )
-        {
+        ) {
             Text(text = "Registrarse")
         }
 
@@ -133,33 +156,35 @@ fun LoginScreen(navController: NavController){
 
         Text(text = "Puedes ingresar con")
 
-        Row (
-            modifier = Modifier.fillMaxWidth().padding(40.dp),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(40.dp),
             horizontalArrangement = Arrangement.Absolute.SpaceEvenly
-
-            ) {
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_google),
                 contentDescription = "Google",
-                modifier = Modifier.size(60.dp).clickable {
-                    //Google clicked
-                    } )
+                modifier = Modifier
+                    .size(60.dp)
+                    .clickable { /* Google clicked */ }
+            )
 
             Image(
                 painter = painterResource(id = R.drawable.ic_blackx),
                 contentDescription = "Twitter",
-                modifier = Modifier.size(60.dp).clickable {
-                    //Twitter clicked
-                })
+                modifier = Modifier
+                    .size(60.dp)
+                    .clickable { /* Twitter clicked */ }
+            )
 
             Image(
                 painter = painterResource(id = R.drawable.ic_fac),
                 contentDescription = "Facebook",
-                modifier = Modifier.size(60.dp).clickable {
-                    //Facebook clicked
-                })
+                modifier = Modifier
+                    .size(60.dp)
+                    .clickable { /* Facebook clicked */ }
+            )
         }
-
     }
-
 }

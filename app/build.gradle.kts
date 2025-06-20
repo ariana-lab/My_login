@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.googleServices)
 }
 
 android {
@@ -61,7 +62,9 @@ dependencies {
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.4.0-alpha14")
     implementation("androidx.compose.material:material:1.8.1")
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
-
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.navigation.compose)
 
     val nav_version = "2.9.0"
     implementation("androidx.navigation:navigation-compose:$nav_version")

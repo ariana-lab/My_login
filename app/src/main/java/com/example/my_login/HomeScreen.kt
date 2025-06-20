@@ -11,10 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.my_login.R
+
+
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -29,13 +29,12 @@ fun HomeScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconPerfil()
+            IconPerfil(navController)
             IconMenu()
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Imagen central grande (Estadísticas)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -98,14 +97,14 @@ fun HomeScreen(navController: NavController) {
 }
 
 @Composable
-fun IconPerfil() {
+fun IconPerfil(navController: NavController) {
     Image(
         painter = painterResource(id = R.drawable.ic_logo),
         contentDescription = "Perfil",
         modifier = Modifier
             .size(32.dp)
             .clickable {
-                println("Perfil presionado")
+                navController.navigate(Routes.perfilscreen)
             }
     )
 }
@@ -207,4 +206,3 @@ fun BottomButton(imageRes: Int, description: String, onClick: () -> Unit,) {
         )
     }
 }
-
