@@ -30,13 +30,13 @@ class MainActivity : ComponentActivity() {
                     RegisterScreen(navController, auth)
                 }
                 composable(Routes.homescreen) {
-                    HomeScreen(navController)
+                    HomeScreen(navController, auth)
                 }
                 composable(Routes.perfilscreen) {
                     PerfilScreen(navController, auth)
                 }
                 composable(Routes.stadisticscreen) {
-                    Inicio()
+                    StatisticScreen()
                 }
 
             }

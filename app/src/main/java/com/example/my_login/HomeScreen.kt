@@ -13,11 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, auth: FirebaseAuth){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -30,7 +30,7 @@ fun HomeScreen(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             IconPerfil(navController)
-            IconMenu()
+            IconMenu(navController, auth)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -110,14 +110,18 @@ fun IconPerfil(navController: NavController) {
 }
 
 @Composable
-fun IconMenu() {
+fun IconMenu(navController: NavController, auth: FirebaseAuth) {
     Image(
         painter = painterResource(id = R.drawable.ic_menu),
         contentDescription = "Menú",
         modifier = Modifier
             .size(32.dp)
             .clickable {
-                println("Menú presionado")
+                // Cerrar sesión y navegar al login
+                auth.signOut()
+                navController.navigate(Routes.loginscreen) {
+                    popUpTo(0) { inclusive = true } // Limpia el backstack
+                }
             }
     )
 }
