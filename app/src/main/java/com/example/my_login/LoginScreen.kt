@@ -72,7 +72,7 @@ fun LoginScreen(navController: NavController, auth: FirebaseAuth) {
             value = email,
             onValueChange = { email = it },
             label = { Text(text = "Email...") },
-            shape = RoundedCornerShape(20.dp), // Bordes redondeados
+            shape = RoundedCornerShape(20.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.White,
                 unfocusedBorderColor = Color.White
