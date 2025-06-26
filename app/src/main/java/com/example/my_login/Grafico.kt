@@ -1,7 +1,5 @@
 package com.example.my_login
 
-
-
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
