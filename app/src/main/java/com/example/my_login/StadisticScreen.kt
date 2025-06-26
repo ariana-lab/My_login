@@ -53,7 +53,7 @@ fun StatisticScreen() {
         username = user?.email?.substringBefore("@") ?: "Perfil"
         if (userId.isBlank()) return@LaunchedEffect
 
-        // Consulta Firestore para obtener el nombre del usuario
+        // Consulta la Firestore para obtener el nombre del usuario
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
