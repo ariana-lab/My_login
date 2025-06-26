@@ -3,7 +3,6 @@ package com.example.my_login
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -20,21 +19,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun RegisterScreen(navController: NavController, auth: FirebaseAuth) {
+    val db = FirebaseFirestore.getInstance()
+
+    var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFFDE3163), Color(0xFFFFFFFF))
-                )
-            )
+            .background(Brush.verticalGradient(colors = listOf(Color(0xFFDE3163), Color.White)))
             .padding(horizontal = 24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -50,6 +50,21 @@ fun RegisterScreen(navController: NavController, auth: FirebaseAuth) {
         Text(text = "Crea tu cuenta!")
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = nombre,
+            onValueChange = { nombre = it },
+            label = { Text("Nombre...") },
+            shape = RoundedCornerShape(20.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = Color.White,
+                unfocusedBorderColor = Color.White
+            ),
+            textStyle = TextStyle(color = Color.Black, fontSize = 16.sp),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = email,
@@ -105,13 +120,28 @@ fun RegisterScreen(navController: NavController, auth: FirebaseAuth) {
                 error = "La contraseña debe tener al menos 6 caracteres"
             } else {
                 auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            navController.navigate(Routes.homescreen) {
-                                popUpTo("register") { inclusive = true }
+                    .addOnCompleteListener { result ->
+                        if (result.isSuccessful) {
+                            val userId = auth.currentUser?.uid
+                            val userProfile = hashMapOf(
+                                "nombre" to nombre,
+                                "email" to email
+                            )
+
+                            userId?.let {
+                                db.collection("users").document(it)
+                                    .set(userProfile)
+                                    .addOnSuccessListener {
+                                        navController.navigate(Routes.homescreen) {
+                                            popUpTo("register") { inclusive = true }
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        error = "Error guardando perfil: ${e.localizedMessage}"
+                                    }
                             }
                         } else {
-                            error = "Error: ${it.exception?.localizedMessage}"
+                            error = "Error de registro: ${result.exception?.localizedMessage}"
                         }
                     }
             }

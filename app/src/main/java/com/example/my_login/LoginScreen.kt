@@ -34,7 +34,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.TextStyle
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun LoginScreen(navController: NavController, auth: FirebaseAuth) {
@@ -102,13 +102,30 @@ fun LoginScreen(navController: NavController, auth: FirebaseAuth) {
                 auth.signInWithEmailAndPassword(email, contraseña)
                     .addOnCompleteListener { result ->
                         if (result.isSuccessful) {
-                            error = null
-                            navController.navigate(Routes.homescreen) {
-                                popUpTo("login") { inclusive = true }
+                            val userId = auth.currentUser?.uid
+                            val db = FirebaseFirestore.getInstance()
+
+                            userId?.let { uid ->
+                                db.collection("users").document(uid).get()
+                                    .addOnSuccessListener { document ->
+                                        if (document != null && document.exists()) {
+                                            UserData.nombre = document.getString("nombre") ?: ""
+                                            UserData.email = email
+
+                                            navController.navigate(Routes.homescreen) {
+                                                popUpTo("login") { inclusive = true }
+                                            }
+                                        } else {
+                                            error = "No se encontró perfil asociado."
+                                        }
+                                    }
+                                    .addOnFailureListener { e ->
+                                        error = "Error cargando perfil: ${e.localizedMessage}"
+                                    }
                             }
                         } else {
                             error =
-                                "No tienes una cuenta con esas credenciales.\n¡Regístrate para guardar tus estadísticas!"
+                                "Cuenta no encontrada.\n¡Regístrate para guardar tus estadísticas!"
                         }
                     }
             },
